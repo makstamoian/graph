@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
+use rand::Rng;
 
 // Nodes: 1, 2, 3, 4, 5
 // Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
@@ -23,24 +24,49 @@ impl Graph {
     }
 
     fn add_edge(&mut self, source: u32, target: u32) {
-        self.nodes.entry(source)
-            .and_modify(|adjacency_set: &mut HashSet<u32>|{adjacency_set.insert(target);});
-        // self.nodes.get_mut(&source).insert(target);
-        // self.nodes[&target].insert(source);
+        if source != target {
+            self.nodes.entry(source)
+                .and_modify(|adjacency_set: &mut HashSet<u32>|{adjacency_set.insert(target);});
+            self.nodes.entry(target)
+                .and_modify(|adjacency_set: &mut HashSet<u32>|{adjacency_set.insert(source);});
+        }
+    }
+
+    fn dfs (&self, node: u32, visited_nodes: &mut Vec<u32>) {
+
+        visited_nodes.push(node);
+        println!("Nodes for: {} = {:?}\nWith the visited nodes content: {:?}", node, &self.nodes[&node], visited_nodes);
+        for new_node in &self.nodes[&node]{
+            if visited_nodes.contains(new_node) != true {
+                self.dfs(*new_node, visited_nodes)
+            } else {
+                continue;
+            }
+        }
     }
 }
 
-fn main() {
+fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
     let mut graph = Graph { nodes: HashMap::new() };
+    for node in 0.. nodes_count + 1 {
+        graph.add_node(node)
+    }
+    for edge in 0.. edges_count + 1 {
+        let source_node = rand::thread_rng().gen_range(0, nodes_count);
+        let target_node = rand::thread_rng().gen_range(0, nodes_count);
 
-    graph.add_node(1);
-    graph.add_node(2);
-    graph.add_node(4);
-    graph.add_node(7);
-    graph.add_node(9);
-    graph.add_edge(1, 4);
-    graph.add_edge(2, 4);
-    graph.add_edge(4, 7);
+        println!("Adding edge {} into {}...", &source_node, &target_node);
+        graph.add_edge(source_node, target_node)
+    }
+    return graph;
+}
 
-    println!("\n{:#?}", graph)
+fn main() {
+
+    // graph.dfs(1, &mut visited_nodes);
+    let my_graph = generate_graph(5, 100);
+
+    let mut visited_nodes = Vec::new();
+
+    my_graph.dfs(0, &mut visited_nodes);
 }
