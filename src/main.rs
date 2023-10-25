@@ -32,9 +32,9 @@ impl Graph {
         }
     }
 
-    fn dfs (&self, node: u32, visited_nodes: &mut Vec<u32>) {
+    fn dfs (&self, node: u32, visited_nodes: &mut HashSet<u32>) {
+        visited_nodes.insert(node);
 
-        visited_nodes.push(node);
         for new_node in &self.nodes[&node]{
             if visited_nodes.contains(new_node) != true {
                 self.dfs(*new_node, visited_nodes)
@@ -67,12 +67,12 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
 }
 
 fn main() {
+    let my_graph = generate_graph(10, 11);
 
-    let my_graph = generate_graph(100, 111);
-
-    let mut visited_nodes = Vec::new();
+    let mut visited_nodes = HashSet::new();
 
     my_graph.dfs(0, &mut visited_nodes);
 
     println!("Visited total of {} nodes:\n{:#?}", visited_nodes.len(), visited_nodes);
 }
+
