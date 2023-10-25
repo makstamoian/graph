@@ -35,7 +35,6 @@ impl Graph {
     fn dfs (&self, node: u32, visited_nodes: &mut Vec<u32>) {
 
         visited_nodes.push(node);
-        println!("Nodes for: {} = {:?}\nWith the visited nodes content: {:?}", node, &self.nodes[&node], visited_nodes);
         for new_node in &self.nodes[&node]{
             if visited_nodes.contains(new_node) != true {
                 self.dfs(*new_node, visited_nodes)
@@ -51,11 +50,17 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
     for node in 0.. nodes_count + 1 {
         graph.add_node(node)
     }
-    for edge in 0.. edges_count + 1 {
+    for _edge in 0.. edges_count + 1 {
         let source_node = rand::thread_rng().gen_range(0, nodes_count);
-        let target_node = rand::thread_rng().gen_range(0, nodes_count);
+        let mut target_node: u32;
 
-        println!("Adding edge {} into {}...", &source_node, &target_node);
+        loop {
+            target_node = rand::thread_rng().gen_range(0, nodes_count);
+            if target_node != source_node {
+                break;
+            }
+        }
+
         graph.add_edge(source_node, target_node)
     }
     return graph;
@@ -63,10 +68,11 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
 
 fn main() {
 
-    // graph.dfs(1, &mut visited_nodes);
-    let my_graph = generate_graph(5, 100);
+    let my_graph = generate_graph(100, 111);
 
     let mut visited_nodes = Vec::new();
 
     my_graph.dfs(0, &mut visited_nodes);
+
+    println!("Visited total of {} nodes:\n{:#?}", visited_nodes.len(), visited_nodes);
 }
