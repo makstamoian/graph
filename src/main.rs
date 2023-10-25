@@ -36,11 +36,11 @@ impl Graph {
         visited_nodes.insert(node);
 
         for new_node in &self.nodes[&node]{
-            if visited_nodes.contains(new_node) != true {
-                self.dfs(*new_node, visited_nodes)
-            } else {
+            if visited_nodes.contains(new_node) {
                 continue;
             }
+
+            self.dfs(*new_node, visited_nodes)
         }
     }
 }
