@@ -32,6 +32,15 @@ impl Graph {
         }
     }
 
+    fn get_nodes(&self) -> HashSet<u32> {
+        let mut nodes: HashSet<u32> = HashSet::new();
+        for key in self.nodes.keys() {
+            nodes.insert(*key);
+        }
+
+        return nodes;
+    }
+
     fn dfs (&self, node: u32, visited_nodes: &mut HashSet<u32>) {
         visited_nodes.insert(node);
 
@@ -74,5 +83,6 @@ fn main() {
     my_graph.dfs(0, &mut visited_nodes);
 
     println!("Visited total of {} nodes:\n{:#?}", visited_nodes.len(), visited_nodes);
+    println!("{:#?}", my_graph.get_nodes());
 }
 
