@@ -104,13 +104,15 @@ fn main() {
 
     my_graph.depth_first_search(0, &mut visited_nodes);
 
-    println!("Visited total of {} nodes:\n{:#?}", visited_nodes.len(), visited_nodes);
+    println!("Visited total of {} nodes:\n{:#?}\n", visited_nodes.len(), visited_nodes);
 
-    println!("List of all node ids in generated graph:\n{:#?}", my_graph.get_nodes());    
+    println!("List of all node ids in generated graph:\n{:#?}\n", my_graph.get_nodes());    
 
-    println!("Check if generated graph contains node with id 1: {}", my_graph.has_node(1));
+    println!("Check if generated graph contains node with id 1: {}\n", my_graph.has_node(1));
 
-    println!("{:#?}", my_graph.get_node_adjacents(2));
+    println!("Check if generated graph contains edge from 1 to 3: {}\n", my_graph.has_edge(1, 3));
+
+    println!("Adjacents nodes for node 2: {:#?}", my_graph.get_node_adjacents(2));
 
     my_graph.clear();
 }
