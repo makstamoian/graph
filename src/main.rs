@@ -1,6 +1,6 @@
+use rand::Rng;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use rand::Rng;
 
 // Nodes: 1, 2, 3, 4, 5
 // Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
@@ -25,10 +25,16 @@ impl Graph {
 
     fn add_edge(&mut self, source: u32, target: u32) {
         if source != target {
-            self.nodes.entry(source)
-                .and_modify(|adjacency_set: &mut HashSet<u32>|{adjacency_set.insert(target);});
-            self.nodes.entry(target)
-                .and_modify(|adjacency_set: &mut HashSet<u32>|{adjacency_set.insert(source);});
+            self.nodes
+                .entry(source)
+                .and_modify(|adjacency_set: &mut HashSet<u32>| {
+                    adjacency_set.insert(target);
+                });
+            self.nodes
+                .entry(target)
+                .and_modify(|adjacency_set: &mut HashSet<u32>| {
+                    adjacency_set.insert(source);
+                });
         }
     }
 
@@ -46,25 +52,25 @@ impl Graph {
     }
 
     fn has_node(&self, node: u32) -> bool {
-        return self.nodes.contains_key(&node)
-    }   
+        return self.nodes.contains_key(&node);
+    }
 
     fn has_edge(&self, node_a: u32, node_b: u32) -> bool {
         if self.has_node(node_a) && self.has_node(node_b) {
-            return self.nodes[&node_a].contains(&node_b) && self.nodes[&node_b].contains(&node_a)
+            return self.nodes[&node_a].contains(&node_b) && self.nodes[&node_b].contains(&node_a);
         }
 
         return false;
     }
 
-    fn get_node_adjacents(&self, node: u32) -> &HashSet<u32>{
+    fn get_node_adjacents(&self, node: u32) -> &HashSet<u32> {
         return &self.nodes[&node];
     }
 
-    fn depth_first_search (&self, node: u32, visited_nodes: &mut HashSet<u32>) {
+    fn depth_first_search(&self, node: u32, visited_nodes: &mut HashSet<u32>) {
         visited_nodes.insert(node);
 
-        for new_node in &self.nodes[&node]{
+        for new_node in &self.nodes[&node] {
             if visited_nodes.contains(new_node) {
                 continue;
             }
@@ -73,7 +79,7 @@ impl Graph {
         }
     }
 
-    fn is_connected (&self) -> bool {
+    fn is_connected(&self) -> bool {
         let mut visited_nodes = HashSet::new();
 
         self.depth_first_search(0, &mut visited_nodes);
@@ -83,20 +89,21 @@ impl Graph {
         return true;
     }
 
-    fn clear (&mut self) -> &HashMap<u32, HashSet<u32>>{
+    fn clear(&mut self) -> &HashMap<u32, HashSet<u32>> {
         let _ = &self.nodes.clear();
 
         return &self.nodes;
     }
-
 }
 
 fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
-    let mut graph = Graph { nodes: HashMap::new() };
-    for node in 0.. nodes_count + 1 {
+    let mut graph = Graph {
+        nodes: HashMap::new(),
+    };
+    for node in 0..nodes_count + 1 {
         graph.add_node(node)
     }
-    for _edge in 0.. edges_count + 1 {
+    for _edge in 0..edges_count + 1 {
         let source_node = rand::thread_rng().gen_range(0, nodes_count);
         let mut target_node: u32;
 
@@ -120,15 +127,31 @@ fn main() {
 
     my_graph.depth_first_search(0, &mut visited_nodes);
 
-    println!("Visited total of {} nodes:\n{:#?}\n", visited_nodes.len(), visited_nodes);
+    println!(
+        "Visited total of {} nodes:\n{:#?}\n",
+        visited_nodes.len(),
+        visited_nodes
+    );
 
-    println!("List of all node ids in generated graph:\n{:#?}\n", my_graph.get_nodes());    
+    println!(
+        "List of all node ids in generated graph:\n{:#?}\n",
+        my_graph.get_nodes()
+    );
 
-    println!("Check if generated graph contains node with id 1: {}\n", my_graph.has_node(1));
+    println!(
+        "Check if generated graph contains node with id 1: {}\n",
+        my_graph.has_node(1)
+    );
 
-    println!("Check if generated graph contains edge from 1 to 3: {}\n", my_graph.has_edge(1, 3));
+    println!(
+        "Check if generated graph contains edge from 1 to 3: {}\n",
+        my_graph.has_edge(1, 3)
+    );
 
-    println!("Adjacents nodes for node 2: {:#?}", my_graph.get_node_adjacents(2));
+    println!(
+        "Adjacents nodes for node 2: {:#?}",
+        my_graph.get_node_adjacents(2)
+    );
 
     println!("Is graph connected: {:#?}", my_graph.is_connected());
 
@@ -136,7 +159,10 @@ fn main() {
 
     my_graph.drop_node(1);
 
-    println!("Check if graph has node 1 after its deletion: {:#?}\n", my_graph.has_node(1));
+    println!(
+        "Check if graph has node 1 after its deletion: {:#?}\n",
+        my_graph.has_node(1)
+    );
 
     my_graph.clear();
 }
@@ -147,9 +173,11 @@ mod tests {
     // This function creates universe-usable graph in the field of tests, which is suitable for almost every test.
     // For tests, there the tested graph has to have specific properties (be disconnected)
 
-    fn generate_test_graph() -> Graph{
-        let mut graph = Graph { nodes: HashMap::new() };
-        
+    fn generate_test_graph() -> Graph {
+        let mut graph = Graph {
+            nodes: HashMap::new(),
+        };
+
         graph.add_node(0);
         graph.add_node(1);
         graph.add_node(2);
@@ -178,7 +206,7 @@ mod tests {
     #[test]
     fn test_graph_clear() {
         let mut graph = generate_test_graph();
-        
+
         graph.clear();
 
         assert_eq!(graph.get_nodes(), HashSet::from([]));
@@ -186,7 +214,9 @@ mod tests {
 
     #[test]
     fn test_graph_has_node() {
-        let mut graph = Graph { nodes: HashMap::new() };
+        let mut graph = Graph {
+            nodes: HashMap::new(),
+        };
 
         graph.add_node(0);
 
@@ -209,24 +239,25 @@ mod tests {
         assert_eq!(graph.get_nodes(), HashSet::from([1, 2]));
     }
 
-
     #[test]
     fn test_graph_connected_true() {
         let graph = generate_test_graph();
-        
+
         assert_eq!(graph.is_connected(), true);
     }
 
     #[test]
     fn test_graph_connected_false() {
-        let mut graph = Graph { nodes: HashMap::new() };
+        let mut graph = Graph {
+            nodes: HashMap::new(),
+        };
 
         graph.add_node(0);
         graph.add_node(1);
         graph.add_node(2);
 
         graph.add_edge(0, 1);
-        
+
         assert_eq!(graph.is_connected(), false);
     }
 }
