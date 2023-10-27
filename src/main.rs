@@ -32,6 +32,10 @@ impl Graph {
         }
     }
 
+    fn drop_node(&mut self, node: u32) {
+        self.nodes.remove(&node);
+    }
+
     fn get_nodes(&self) -> HashSet<u32> {
         let mut nodes: HashSet<u32> = HashSet::new();
         for key in self.nodes.keys() {
@@ -69,11 +73,22 @@ impl Graph {
         }
     }
 
+    fn is_connected (&self) -> bool {
+        let mut visited_nodes = HashSet::new();
+
+        self.depth_first_search(0, &mut visited_nodes);
+        if visited_nodes.len() < self.nodes.len() {
+            return false;
+        }
+        return true;
+    }
+
     fn clear (&mut self) -> &HashMap<u32, HashSet<u32>>{
         let _ = &self.nodes.clear();
 
         return &self.nodes;
     }
+
 }
 
 fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
@@ -94,6 +109,7 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
 
         graph.add_edge(source_node, target_node)
     }
+
     return graph;
 }
 
@@ -114,49 +130,54 @@ fn main() {
 
     println!("Adjacents nodes for node 2: {:#?}", my_graph.get_node_adjacents(2));
 
+    println!("Is graph connected: {:#?}", my_graph.is_connected());
+
+    println!("Dropping node 1...");
+
+    my_graph.drop_node(1);
+
+    println!("Check if graph has node 1 after its deletion: {:#?}\n", my_graph.has_node(1));
+
     my_graph.clear();
 }
 
 #[cfg(test)]
 mod tests {
+
+    // This function creates universe-usable graph in the field of tests, which is suitable for almost every test.
+    // For tests, there the tested graph has to have specific properties (be disconnected)
+
+    fn generate_test_graph() -> Graph{
+        let mut graph = Graph { nodes: HashMap::new() };
+        
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+
+        graph.add_edge(0, 1);
+        graph.add_edge(1, 2);
+
+        return graph;
+    }
+
     use super::*;
     #[test]
     fn test_graph_add_node() {
-        let mut graph = Graph { nodes: HashMap::new() };
+        let graph = generate_test_graph();
 
-        graph.add_node(1);
-        graph.add_node(2);
-        graph.add_node(3);
-
-        assert_eq!(graph.get_nodes(), HashSet::from([1, 2, 3]));
+        assert_eq!(graph.get_nodes(), HashSet::from([0, 1, 2]));
     }
 
     #[test]
     fn test_graph_add_edge() {
-        let mut graph = Graph { nodes: HashMap::new() };
-
-        graph.add_node(1);
-        graph.add_node(2);
-        graph.add_node(3);
-
-        graph.add_edge(1, 2);
-        graph.add_edge(2, 3);
-        graph.add_edge(3, 2);
+        let graph = generate_test_graph();
 
         assert_eq!(graph.has_edge(1, 2), true);
     }
 
     #[test]
     fn test_graph_clear() {
-        let mut graph = Graph { nodes: HashMap::new() };
-
-        graph.add_node(1);
-        graph.add_node(2);
-        graph.add_node(3);
-
-        graph.add_edge(1, 2);
-        graph.add_edge(2, 3);
-        graph.add_edge(3, 2);
+        let mut graph = generate_test_graph();
         
         graph.clear();
 
@@ -167,23 +188,45 @@ mod tests {
     fn test_graph_has_node() {
         let mut graph = Graph { nodes: HashMap::new() };
 
-        graph.add_node(1);
+        graph.add_node(0);
 
-        assert_eq!(graph.has_node(1), true);
+        assert_eq!(graph.has_node(0), true);
     }
 
     #[test]
     fn test_graph_has_edge() {
+        let graph = generate_test_graph();
+
+        assert_eq!(graph.has_edge(0, 1), true);
+    }
+
+    #[test]
+    fn test_graph_drops_node() {
+        let mut graph = generate_test_graph();
+
+        graph.drop_node(0);
+
+        assert_eq!(graph.get_nodes(), HashSet::from([1, 2]));
+    }
+
+
+    #[test]
+    fn test_graph_connected_true() {
+        let graph = generate_test_graph();
+        
+        assert_eq!(graph.is_connected(), true);
+    }
+
+    #[test]
+    fn test_graph_connected_false() {
         let mut graph = Graph { nodes: HashMap::new() };
 
+        graph.add_node(0);
         graph.add_node(1);
         graph.add_node(2);
-        graph.add_node(3);
 
-        graph.add_edge(1, 2);
-        graph.add_edge(2, 3);
-        graph.add_edge(3, 2);
+        graph.add_edge(0, 1);
         
-        assert_eq!(graph.has_edge(1, 2), true);
+        assert_eq!(graph.is_connected(), false);
     }
 }
