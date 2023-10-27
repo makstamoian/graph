@@ -1,0 +1,24 @@
+name: Cargo build
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure cargo
+      run: cargo update
+
+    - name: Build into executable
+      run: cargo build
+      
+    - name: Upload built binary
+      uses: actions/upload-artifact@v3
+      with:
+         name: graph
+         path: ${{github.workspace}}/target/debug
