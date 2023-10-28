@@ -74,6 +74,8 @@ fn main() {
 
     println!("Is graph connected: {:#?}", my_graph.is_connected());
 
+    println!("Graph leaf nodes: {:#?}", my_graph.get_leaf_nodes());
+
     println!("Dropping node 1...");
 
     my_graph.drop_node(1);
@@ -177,5 +179,23 @@ mod tests {
         graph.add_edge(0, 1);
 
         assert_eq!(graph.is_connected(), false);
+    }
+
+    #[test]
+    fn test_graph_get_leaf_nodes() {
+        let mut graph = graph::Graph {
+            nodes: HashMap::new(),
+        };
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1);
+        graph.add_edge(1, 2);
+        graph.add_edge(2, 3);
+
+        assert_eq!(graph.get_leaf_nodes(), HashSet::from([0, 3]));
     }
 }

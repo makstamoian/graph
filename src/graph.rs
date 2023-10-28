@@ -57,6 +57,19 @@ impl Graph {
         return &self.nodes[&node];
     }
 
+    pub fn get_leaf_nodes(&self) -> HashSet<u32> {
+        
+        let mut leaf_nodes:HashSet<u32> = HashSet::new();
+
+        for node in self.nodes.keys() {
+            if self.get_node_adjacents(*node).len() == 1 {
+                leaf_nodes.insert(*node);
+            }
+        }
+
+        return leaf_nodes;
+    }
+
     pub fn depth_first_search(&self, node: u32, visited_nodes: &mut HashSet<u32>) {
         visited_nodes.insert(node);
 
