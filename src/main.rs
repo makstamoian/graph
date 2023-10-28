@@ -2,6 +2,8 @@ use rand::Rng;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
+mod graph;
+
 // Nodes: 1, 2, 3, 4, 5
 // Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
 
@@ -13,91 +15,8 @@ use std::collections::HashSet;
 // 3 => Set[4]
 // 4 => Set[5]
 
-#[derive(Debug)]
-struct Graph {
-    nodes: HashMap<u32, HashSet<u32>>,
-}
-
-impl Graph {
-    fn add_node(&mut self, node: u32) {
-        self.nodes.insert(node, HashSet::new());
-    }
-
-    fn add_edge(&mut self, source: u32, target: u32) {
-        if source != target {
-            self.nodes
-                .entry(source)
-                .and_modify(|adjacency_set: &mut HashSet<u32>| {
-                    adjacency_set.insert(target);
-                });
-            self.nodes
-                .entry(target)
-                .and_modify(|adjacency_set: &mut HashSet<u32>| {
-                    adjacency_set.insert(source);
-                });
-        }
-    }
-
-    fn drop_node(&mut self, node: u32) {
-        self.nodes.remove(&node);
-    }
-
-    fn get_nodes(&self) -> HashSet<u32> {
-        let mut nodes: HashSet<u32> = HashSet::new();
-        for key in self.nodes.keys() {
-            nodes.insert(*key);
-        }
-
-        return nodes;
-    }
-
-    fn has_node(&self, node: u32) -> bool {
-        return self.nodes.contains_key(&node);
-    }
-
-    fn has_edge(&self, node_a: u32, node_b: u32) -> bool {
-        if self.has_node(node_a) && self.has_node(node_b) {
-            return self.nodes[&node_a].contains(&node_b) && self.nodes[&node_b].contains(&node_a);
-        }
-
-        return false;
-    }
-
-    fn get_node_adjacents(&self, node: u32) -> &HashSet<u32> {
-        return &self.nodes[&node];
-    }
-
-    fn depth_first_search(&self, node: u32, visited_nodes: &mut HashSet<u32>) {
-        visited_nodes.insert(node);
-
-        for new_node in &self.nodes[&node] {
-            if visited_nodes.contains(new_node) {
-                continue;
-            }
-
-            self.depth_first_search(*new_node, visited_nodes)
-        }
-    }
-
-    fn is_connected(&self) -> bool {
-        let mut visited_nodes = HashSet::new();
-
-        self.depth_first_search(0, &mut visited_nodes);
-        if visited_nodes.len() < self.nodes.len() {
-            return false;
-        }
-        return true;
-    }
-
-    fn clear(&mut self) -> &HashMap<u32, HashSet<u32>> {
-        let _ = &self.nodes.clear();
-
-        return &self.nodes;
-    }
-}
-
-fn generate_graph(nodes_count: u32, edges_count: u32) -> Graph {
-    let mut graph = Graph {
+fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
+    let mut graph = graph::Graph {
         nodes: HashMap::new(),
     };
     for node in 0..nodes_count + 1 {
@@ -169,12 +88,11 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-
     // This function creates universe-usable graph in the field of tests, which is suitable for almost every test.
     // For tests, there the tested graph has to have specific properties (be disconnected)
 
-    fn generate_test_graph() -> Graph {
-        let mut graph = Graph {
+    fn generate_test_graph() -> graph::Graph {
+        let mut graph = graph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -214,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_graph_has_node() {
-        let mut graph = Graph {
+        let mut graph = graph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -248,7 +166,7 @@ mod tests {
 
     #[test]
     fn test_graph_connected_false() {
-        let mut graph = Graph {
+        let mut graph = graph::Graph {
             nodes: HashMap::new(),
         };
 
