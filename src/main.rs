@@ -1,6 +1,5 @@
 use rand::Rng;
 use std::collections::HashMap;
-use std::collections::HashSet;
 
 mod graph;
 
@@ -42,9 +41,7 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
 fn main() {
     let mut my_graph = generate_graph(10, 11);
 
-    let mut visited_nodes = HashSet::new();
-
-    my_graph.depth_first_search(0, &mut visited_nodes);
+    let visited_nodes = my_graph.depth_first_search(0);
 
     println!(
         "Visited total of {} nodes:\n{:#?}\n",
@@ -90,6 +87,8 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     // This function creates universe-usable graph in the field of tests, which is suitable for almost every test.
     // For tests, there the tested graph has to have specific properties (be disconnected)
 

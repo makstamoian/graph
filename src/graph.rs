@@ -70,7 +70,7 @@ impl Graph {
         return leaf_nodes;
     }
 
-    pub fn depth_first_search(&self, node: u32, visited_nodes: &mut HashSet<u32>) {
+    fn depth_first_search_child(&self, node: u32, visited_nodes: &mut HashSet<u32>) {
         visited_nodes.insert(node);
 
         for new_node in &self.nodes[&node] {
@@ -78,14 +78,20 @@ impl Graph {
                 continue;
             }
 
-            self.depth_first_search(*new_node, visited_nodes)
+            self.depth_first_search_child(*new_node, visited_nodes)
         }
     }
 
-    pub fn is_connected(&self) -> bool {
+    pub fn depth_first_search(&self, node: u32) -> HashSet<u32> {
         let mut visited_nodes = HashSet::new();
 
-        self.depth_first_search(0, &mut visited_nodes);
+        self.depth_first_search_child(node, &mut visited_nodes);
+        return visited_nodes;
+    }
+
+    pub fn is_connected(&self) -> bool {
+
+        let visited_nodes = self.depth_first_search(0);
         if visited_nodes.len() < self.nodes.len() {
             return false;
         }
