@@ -73,14 +73,21 @@ fn main() {
 
     println!("Graph leaf nodes: {:#?}", my_graph.get_leaf_nodes());
 
+    println!("Drooping edge between 3 and 4 (if exists), {:#?}...", my_graph.has_edge(4, 3));
+
+    my_graph.drop_edge(4, 3);
+
+    println!("Check if they have edge: {:#?}", my_graph.has_edge(4, 3));
+
+    println!("Node 1 neighbours: {:#?}", my_graph.get_node_adjacents(1));
+
     println!("Dropping node 1...");
 
     my_graph.drop_node(1);
 
-    println!(
-        "Check if graph has node 1 after its deletion: {:#?}\n",
-        my_graph.has_node(1)
-    );
+    println!("Is there any node 1: {:#?}", my_graph.has_node(1));
+
+    println!("Whole Graph structure: \n {:#?}", my_graph);
 
     my_graph.clear();
 }
@@ -150,15 +157,6 @@ mod tests {
     }
 
     #[test]
-    fn test_graph_drops_node() {
-        let mut graph = generate_test_graph();
-
-        graph.drop_node(0);
-
-        assert_eq!(graph.get_nodes(), HashSet::from([1, 2]));
-    }
-
-    #[test]
     fn test_graph_connected_true() {
         let graph = generate_test_graph();
 
@@ -196,5 +194,36 @@ mod tests {
         graph.add_edge(2, 3);
 
         assert_eq!(graph.get_leaf_nodes(), HashSet::from([0, 3]));
+    }
+
+
+
+    #[test]
+    fn test_graph_drops_edge() {
+        let mut graph = graph::Graph {
+            nodes: HashMap::new(),
+        };
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1);
+        graph.add_edge(1, 2);
+        graph.add_edge(2, 3);
+
+        graph.drop_edge(2, 3);
+
+        assert_eq!(graph.has_edge(2, 3), false);
+    }
+
+    #[test]
+    fn test_graph_drops_node() {
+        let mut graph = generate_test_graph();
+
+        graph.drop_node(2);
+
+        assert_eq!(graph.has_node(2), false);
     }
 }

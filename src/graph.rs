@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-
 #[derive(Debug)]
 
 pub struct Graph {
@@ -28,7 +27,24 @@ impl Graph {
         }
     }
 
+    pub fn drop_edge(&mut self, node_a: u32, node_b: u32) {
+        self.nodes
+            .entry(node_a)
+            .and_modify(|adjacency_set: &mut HashSet<u32>| {
+                adjacency_set.remove(&node_b);
+            });
+        self.nodes
+            .entry(node_b)
+            .and_modify(|adjacency_set: &mut HashSet<u32>| {
+                adjacency_set.remove(&node_a);
+            });
+    }
+
     pub fn drop_node(&mut self, node: u32) {
+        let adjacent_nodes = self.nodes[&node].clone();
+        for adjacent in &adjacent_nodes {
+            self.drop_edge(node, *adjacent);
+        }
         self.nodes.remove(&node);
     }
 
@@ -58,8 +74,7 @@ impl Graph {
     }
 
     pub fn get_leaf_nodes(&self) -> HashSet<u32> {
-        
-        let mut leaf_nodes:HashSet<u32> = HashSet::new();
+        let mut leaf_nodes: HashSet<u32> = HashSet::new();
 
         for node in self.nodes.keys() {
             if self.get_node_adjacents(*node).len() == 1 {
@@ -90,7 +105,6 @@ impl Graph {
     }
 
     pub fn is_connected(&self) -> bool {
-
         let visited_nodes = self.depth_first_search(0);
         if visited_nodes.len() < self.nodes.len() {
             return false;
