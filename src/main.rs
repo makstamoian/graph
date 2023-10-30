@@ -95,7 +95,6 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
-
     // This function creates universe-usable graph in the field of tests, which is suitable for almost every test.
     // For tests, there the tested graph has to have specific properties (be disconnected)
 
