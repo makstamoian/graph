@@ -195,8 +195,6 @@ mod tests {
         assert_eq!(graph.get_leaf_nodes(), HashSet::from([0, 3]));
     }
 
-
-
     #[test]
     fn test_graph_drops_edge() {
         let mut graph = graph::Graph {
