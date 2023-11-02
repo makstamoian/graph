@@ -1,6 +1,5 @@
 use rand::Rng;
 use std::collections::HashMap;
-
 mod graph;
 
 // Nodes: 1, 2, 3, 4, 5
@@ -39,19 +38,15 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
 }
 
 fn main() {
-    let mut my_graph = generate_graph(10, 11);
+    let mut my_graph = generate_graph(100000, 100000);
 
     let visited_nodes = my_graph.depth_first_search(0);
 
-    println!(
-        "Visited total of {} nodes:\n{:#?}\n",
-        visited_nodes.len(),
-        visited_nodes
-    );
+    println!("{:#?}", visited_nodes.len());
 
     println!(
-        "List of all node ids in generated graph:\n{:#?}\n",
-        my_graph.get_nodes()
+        "Visited total of {} nodes",
+        visited_nodes.len(),
     );
 
     println!(
@@ -64,14 +59,7 @@ fn main() {
         my_graph.has_edge(1, 3)
     );
 
-    println!(
-        "Adjacents nodes for node 2: {:#?}",
-        my_graph.get_node_adjacents(2)
-    );
-
     println!("Is graph connected: {:#?}", my_graph.is_connected());
-
-    println!("Graph leaf nodes: {:#?}", my_graph.get_leaf_nodes());
 
     println!("Drooping edge between 3 and 4 (if exists), {:#?}...", my_graph.has_edge(4, 3));
 
@@ -86,8 +74,6 @@ fn main() {
     my_graph.drop_node(1);
 
     println!("Is there any node 1: {:#?}", my_graph.has_node(1));
-
-    println!("Whole Graph structure: \n {:#?}", my_graph);
 
     my_graph.clear();
 }

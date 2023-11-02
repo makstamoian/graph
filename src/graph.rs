@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::collections::VecDeque;
+use std::time::Instant;
 
 #[derive(Debug)]
 pub struct Graph {
@@ -84,22 +86,27 @@ impl Graph {
         return leaf_nodes;
     }
 
-    fn depth_first_search_child(&self, node: u32, visited_nodes: &mut HashSet<u32>) {
-        visited_nodes.insert(node);
+    pub fn depth_first_search (&self, node: u32) -> HashSet<u32> {
 
-        for new_node in &self.nodes[&node] {
-            if visited_nodes.contains(new_node) {
-                continue;
+        let mut stack: VecDeque<u32> = VecDeque::new();
+        let mut visited_nodes: HashSet<u32> = HashSet::new();
+        
+        stack.push_back(node);
+        let start = Instant::now();
+
+        while let Some(node_pop) = stack.pop_back() {
+            if visited_nodes.contains(&node_pop) == false {
+                visited_nodes.insert(node_pop);
+                for adjacent in self.get_node_adjacents(node_pop).iter() {
+                    stack.push_back(*adjacent);
+                }
             }
-
-            self.depth_first_search_child(*new_node, visited_nodes)
         }
-    }
+        
+        let end = Instant::now();
+        let duration = end.duration_since(start);
+        println!("Elapsed time: {:#?}", duration);
 
-    pub fn depth_first_search(&self, node: u32) -> HashSet<u32> {
-        let mut visited_nodes = HashSet::new();
-
-        self.depth_first_search_child(node, &mut visited_nodes);
         return visited_nodes;
     }
 
