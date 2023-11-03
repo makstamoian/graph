@@ -14,11 +14,11 @@ jobs:
     - name: Configure cargo
       run: cargo update
 
-    - name: Build into executable
-      run: cargo build
+    - name: Build into release executable
+      run: cargo build --release
       
     - name: Upload built binary
       uses: actions/upload-artifact@v3
       with:
          name: graph
-         path: ${{github.workspace}}/target/debug/graph
+         path: ${{github.workspace}}/target/release/graph
