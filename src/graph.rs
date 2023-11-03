@@ -3,12 +3,30 @@ use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::time::Instant;
 
+
+// Nodes: 1, 2, 3, 4, 5
+// Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
+//
+// Adjacency Sets
+//
+// Map:
+// 1 => Set[2, 3]
+// 2 => Set[4]
+// 3 => Set[4]
+// 4 => Set[5]
+
 #[derive(Debug)]
 pub struct Graph {
     pub nodes: HashMap<u32, HashSet<u32>>,
 }
 
 impl Graph {
+    pub fn new() -> Self {
+        Self {
+            nodes: HashMap::new(),
+        }
+    }
+
     pub fn add_node(&mut self, node: u32) {
         self.nodes.insert(node, HashSet::new());
     }
@@ -116,6 +134,15 @@ impl Graph {
             return false;
         }
         return true;
+    }
+
+    pub fn is_acyclic(&self) -> bool {
+
+        return false
+    }
+
+    pub fn is_tree(&self) -> bool {
+        return self.is_connected();
     }
 
     pub fn clear(&mut self) -> &HashMap<u32, HashSet<u32>> {

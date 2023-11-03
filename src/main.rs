@@ -1,22 +1,8 @@
 use rand::Rng;
-use std::collections::HashMap;
 mod graph;
 
-// Nodes: 1, 2, 3, 4, 5
-// Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
-
-// Adjacency Sets
-
-// Map:
-// 1 => Set[2, 3]
-// 2 => Set[4]
-// 3 => Set[4]
-// 4 => Set[5]
-
 fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
-    let mut graph = graph::Graph {
-        nodes: HashMap::new(),
-    };
+    let mut graph = graph::Graph::new();
     for node in 0..nodes_count + 1 {
         graph.add_node(node)
     }
@@ -80,14 +66,14 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use std::collections::HashSet;
+
     // This function creates universe-usable graph in the field of tests, which is suitable for almost every test.
     // For tests, there the tested graph has to have specific properties (be disconnected)
 
     fn generate_test_graph() -> graph::Graph {
-        let mut graph = graph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = graph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
