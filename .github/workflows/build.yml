@@ -14,6 +14,9 @@ jobs:
     - name: Configure cargo
       run: cargo update
 
+    - name: Run tests
+      run: cargo test
+
     - name: Build into release executable
       run: cargo build --release
       
