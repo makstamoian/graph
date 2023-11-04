@@ -1,5 +1,7 @@
 use rand::Rng;
 mod graph;
+use std::time::Instant;
+
 
 fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
     let mut graph = graph::Graph::new();
@@ -26,40 +28,35 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
 fn main() {
     let mut my_graph = generate_graph(100000, 100000);
 
-    let visited_nodes = my_graph.depth_first_search(0);
+    let start = Instant::now();
 
-    println!("{:#?}", visited_nodes.len());
+    my_graph.serialize();
 
-    println!(
-        "Visited total of {} nodes",
-        visited_nodes.len(),
-    );
+    let end = Instant::now();
+    let duration = end.duration_since(start);
+    println!("Serialisation elapsed time: {:#?}", duration);
 
-    println!(
-        "Check if generated graph contains node with id 1: {}\n",
-        my_graph.has_node(1)
-    );
+    my_graph.depth_first_search(0);
 
-    println!(
-        "Check if generated graph contains edge from 1 to 3: {}\n",
-        my_graph.has_edge(1, 3)
-    );
+    my_graph.has_node(1);
 
-    println!("Is graph connected: {:#?}", my_graph.is_connected());
+    my_graph.has_edge(1, 3);
 
-    println!("Drooping edge between 3 and 4 (if exists), {:#?}...", my_graph.has_edge(4, 3));
+    my_graph.is_connected();
+
+    my_graph.has_edge(4, 3);
 
     my_graph.drop_edge(4, 3);
 
-    println!("Check if they have edge: {:#?}", my_graph.has_edge(4, 3));
+    my_graph.has_edge(4, 3);
 
-    println!("Node 1 neighbours: {:#?}", my_graph.get_node_adjacents(1));
+    my_graph.get_node_adjacents(1);
 
-    println!("Dropping node 1...");
+    my_graph.get_leaf_nodes();
 
     my_graph.drop_node(1);
 
-    println!("Is there any node 1: {:#?}", my_graph.has_node(1));
+    my_graph.has_node(1);
 
     my_graph.clear();
 }
@@ -86,12 +83,6 @@ mod tests {
     }
 
     use super::*;
-    #[test]
-    fn test_graph_add_node() {
-        let graph = generate_test_graph();
-
-        assert_eq!(graph.get_nodes(), HashSet::from([0, 1, 2]));
-    }
 
     #[test]
     fn test_graph_add_edge() {
@@ -106,7 +97,7 @@ mod tests {
 
         graph.clear();
 
-        assert_eq!(graph.get_nodes(), HashSet::from([]));
+        assert_eq!(graph.nodes, HashMap::from([]));
     }
 
     #[test]

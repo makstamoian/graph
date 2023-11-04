@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::time::Instant;
+use std::fmt::Write;
 
 
 // Nodes: 1, 2, 3, 4, 5
@@ -67,15 +68,6 @@ impl Graph {
         self.nodes.remove(&node);
     }
 
-    pub fn get_nodes(&self) -> HashSet<u32> {
-        let mut nodes: HashSet<u32> = HashSet::new();
-        for key in self.nodes.keys() {
-            nodes.insert(*key);
-        }
-
-        return nodes;
-    }
-
     pub fn has_node(&self, node: u32) -> bool {
         return self.nodes.contains_key(&node);
     }
@@ -136,13 +128,17 @@ impl Graph {
         return true;
     }
 
-    pub fn is_acyclic(&self) -> bool {
-
-        return false
-    }
-
-    pub fn is_tree(&self) -> bool {
-        return self.is_connected();
+    pub fn serialize(&self) -> String {
+        let mut result = String::new();
+        
+        for (u, neighbors) in &self.nodes {
+            write!(result, "{}:", u).expect("Error");
+            for v in neighbors {
+                write!(result, " {} ", v).expect("Error");
+            }
+            result.push('\n');
+        }
+        return result
     }
 
     pub fn clear(&mut self) -> &HashMap<u32, HashSet<u32>> {
