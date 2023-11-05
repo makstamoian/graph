@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::time::Instant;
-use std::fmt::Write;
+use serde_json;
 
 
 // Nodes: 1, 2, 3, 4, 5
@@ -128,17 +128,8 @@ impl Graph {
         return true;
     }
 
-    pub fn serialize(&self) -> String {
-        let mut result = String::new();
-        
-        for (u, neighbors) in &self.nodes {
-            write!(result, "{}:", u).expect("Error");
-            for v in neighbors {
-                write!(result, " {} ", v).expect("Error");
-            }
-            result.push('\n');
-        }
-        return result
+    pub fn serialize(&self) -> String {        
+        return serde_json::to_string(&self.nodes).unwrap();
     }
 
     pub fn clear(&mut self) -> &HashMap<u32, HashSet<u32>> {
