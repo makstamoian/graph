@@ -26,7 +26,7 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
 }
 
 fn main() {
-    let mut my_graph = generate_graph(100000, 100000);
+    let mut my_graph = generate_graph(100000, 200000);
 
     let start = Instant::now();
 
@@ -57,6 +57,8 @@ fn main() {
     my_graph.drop_node(1);
 
     my_graph.has_node(1);
+
+    println!("{:#?}", my_graph.breadth_first_search(2, 9));
 
     my_graph.clear();
 }

@@ -101,8 +101,9 @@ impl Graph {
         let mut stack: VecDeque<u32> = VecDeque::new();
         let mut visited_nodes: HashSet<u32> = HashSet::new();
         
-        stack.push_back(node);
         let start = Instant::now();
+
+        stack.push_back(node);
 
         while let Some(node_pop) = stack.pop_back() {
             if visited_nodes.contains(&node_pop) == false {
@@ -115,9 +116,43 @@ impl Graph {
         
         let end = Instant::now();
         let duration = end.duration_since(start);
-        println!("DFS lapsed time: {:#?}", duration);
+        println!("DFS elapsed time: {:#?}", duration);
 
         return visited_nodes;
+    }
+
+    pub fn breadth_first_search (&self, node: u32, target: u32) -> u32 {
+        let mut queue: VecDeque<u32> = VecDeque::new();
+        let mut visited_nodes: HashSet<u32> = HashSet::new();
+
+        let start = Instant::now();
+
+        visited_nodes.insert(node);
+        queue.push_back(node);
+
+        while let Some(node_pop) = queue.pop_front() {
+            if node_pop == target {
+                let end = Instant::now();
+                let duration = end.duration_since(start);
+                println!("BFS lapsed time: {:#?}", duration);
+
+                return node_pop;
+            }
+
+            for adjacent in self.get_node_adjacents(node_pop).iter() {
+                queue.push_back(*adjacent);
+                visited_nodes.insert(*adjacent);
+            }
+
+        }
+
+        let end = Instant::now();
+        let duration = end.duration_since(start);
+
+        println!("BFS lapsed time: {:#?}", duration);
+
+        return u32::MAX;
+
     }
 
     pub fn is_connected(&self) -> bool {
