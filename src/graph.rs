@@ -115,7 +115,7 @@ impl Graph {
         
         let end = Instant::now();
         let duration = end.duration_since(start);
-        println!("Elapsed time: {:#?}", duration);
+        println!("DFS lapsed time: {:#?}", duration);
 
         return visited_nodes;
     }
