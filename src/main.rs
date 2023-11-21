@@ -188,4 +188,11 @@ mod tests {
 
         assert_eq!(graph.has_node(2), false);
     }
+
+    #[test]
+    fn test_breadth_first_search() {
+        let graph = generate_test_graph();
+
+        assert_eq!(graph.breadth_first_search(0, 2), 2)
+    }
 }

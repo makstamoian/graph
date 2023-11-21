@@ -121,7 +121,7 @@ impl Graph {
         return visited_nodes;
     }
 
-    pub fn breadth_first_search (&self, node: u32, target: u32) -> u32 {
+    pub fn breadth_first_search (&self, node: u32, target: u32) -> i32 {
         let mut queue: VecDeque<u32> = VecDeque::new();
         let mut visited_nodes: HashSet<u32> = HashSet::new();
 
@@ -136,7 +136,7 @@ impl Graph {
                 let duration = end.duration_since(start);
                 println!("BFS lapsed time: {:#?}", duration);
 
-                return node_pop;
+                return node_pop as i32;
             }
 
             for adjacent in self.get_node_adjacents(node_pop).iter() {
@@ -151,7 +151,7 @@ impl Graph {
 
         println!("BFS lapsed time: {:#?}", duration);
 
-        return u32::MAX;
+        return -1;
 
     }
 
