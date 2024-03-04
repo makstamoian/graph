@@ -58,6 +58,8 @@ fn main() {
 
     my_graph.has_node(1);
 
+    println!("{:#?}", my_graph.shortest_path(0, 123));
+
     println!("{:#?}", my_graph.breadth_first_search(2, 9));
 
     my_graph.clear();
