@@ -19,7 +19,7 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
             }
         }
 
-        graph.add_edge(source_node, target_node)
+        graph.add_edge(source_node, target_node, rand::thread_rng().gen_range(1,100))
     }
 
     return graph;
@@ -78,8 +78,8 @@ mod tests {
         graph.add_node(1);
         graph.add_node(2);
 
-        graph.add_edge(0, 1);
-        graph.add_edge(1, 2);
+        graph.add_edge(0, 1, 1);
+        graph.add_edge(1, 2, 2);
 
         return graph;
     }
@@ -137,7 +137,7 @@ mod tests {
         graph.add_node(1);
         graph.add_node(2);
 
-        graph.add_edge(0, 1);
+        graph.add_edge(0, 1, 3);
 
         assert_eq!(graph.is_connected(), false);
     }
@@ -153,9 +153,9 @@ mod tests {
         graph.add_node(2);
         graph.add_node(3);
 
-        graph.add_edge(0, 1);
-        graph.add_edge(1, 2);
-        graph.add_edge(2, 3);
+        graph.add_edge(0, 1, 4);
+        graph.add_edge(1, 2, 5);
+        graph.add_edge(2, 3, 6);
 
         assert_eq!(graph.get_leaf_nodes(), HashSet::from([0, 3]));
     }
@@ -171,9 +171,9 @@ mod tests {
         graph.add_node(2);
         graph.add_node(3);
 
-        graph.add_edge(0, 1);
-        graph.add_edge(1, 2);
-        graph.add_edge(2, 3);
+        graph.add_edge(0, 1, 6);
+        graph.add_edge(1, 2, 7);
+        graph.add_edge(2, 3, 8);
 
         graph.drop_edge(2, 3);
 
@@ -194,5 +194,43 @@ mod tests {
         let graph = generate_test_graph();
 
         assert_eq!(graph.breadth_first_search(0, 2), 2)
+    }
+
+    #[test]
+    fn test_graph_shortest_path_1() {
+        let mut graph = graph::Graph {
+            nodes: HashMap::new(),
+        };
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1, 6);
+        graph.add_edge(0, 2, 11);
+        graph.add_edge(1, 2, 7);
+        graph.add_edge(2, 3, 8);
+
+        assert_eq!(graph.shortest_path(0, 2), 11)
+    }
+
+    #[test]
+    fn test_graph_shortest_path_2() {
+        let mut graph = graph::Graph {
+            nodes: HashMap::new(),
+        };
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1, 6);
+        graph.add_edge(0, 2, 16);
+        graph.add_edge(1, 2, 7);
+        graph.add_edge(2, 3, 8);
+
+        assert_eq!(graph.shortest_path(0, 2), 13)
     }
 }
