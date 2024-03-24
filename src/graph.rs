@@ -170,7 +170,6 @@ impl Graph {
             *entry = 0;
         });
 
-
         while queue.len() > 0 {
             let mut closest_node = *queue.iter().next().unwrap();
             for node in &queue {
