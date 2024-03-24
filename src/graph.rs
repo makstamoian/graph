@@ -153,6 +153,17 @@ impl Graph {
         return -1;
     }
 
+    fn restore_path(&self, source: u32, target: u32, parents: HashMap<u32, i32>) -> VecDeque<u32> {
+        let mut path: VecDeque<u32> = VecDeque::from([]);
+        let mut current_node = target;
+        while current_node != source {
+            path.push_front(current_node);
+            current_node = *parents.get(&current_node).unwrap() as u32;
+        }
+        path.push_front(source);
+        return path;
+    }
+
     pub fn shortest_path(&self, source: u32, target: u32) -> i32 {
         if source == target {
             return 0
@@ -160,13 +171,18 @@ impl Graph {
 
         let mut queue: HashSet<u32> = HashSet::new();
         let mut tentative_distances: HashMap<u32, i32> = HashMap::new();
+        let mut parents: HashMap<u32, i32> = HashMap::new();
 
         for node in self.nodes.keys() {
             queue.insert(*node);            
             tentative_distances.insert(*node, i32::MAX);
-        }
+            parents.insert(*node, -1);
+        } // add all nodes to queue and distances HashMap with distance to them as i32::MAX
 
         tentative_distances.entry(source).and_modify(|entry| {
+            *entry = 0;
+        }); // set distance to source to 0
+        parents.entry(source).and_modify(|entry| {
             *entry = 0;
         });
 
@@ -182,6 +198,8 @@ impl Graph {
                 if *tentative_distances.get(&target).unwrap() < 0 || *tentative_distances.get(&target).unwrap() == i32::MAX {
                     return -1;
                 }
+
+                println!("Shortest path: {:?}", self.restore_path(source, target, parents));
                 
                 return *tentative_distances.get(&target).unwrap() as i32;
             }
@@ -199,6 +217,9 @@ impl Graph {
 
                 tentative_distances.entry(node).and_modify(|entry| {
                     *entry = minimal_distance;
+                });
+                parents.entry(node).and_modify(|entry| {
+                    *entry = closest_node as i32;
                 });
             }
         }

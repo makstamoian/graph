@@ -26,7 +26,7 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
 }
 
 fn main() {
-    let mut my_graph = generate_graph(100000, 200000);
+    let mut my_graph = generate_graph(10000, 20000);
 
     let start = Instant::now();
 
@@ -58,9 +58,15 @@ fn main() {
 
     my_graph.has_node(1);
 
-    println!("{:#?}", my_graph.shortest_path(0, 123));
+    let dijkstra_start = Instant::now();
 
-    println!("{:#?}", my_graph.breadth_first_search(2, 9));
+    println!("{:#?}", my_graph.shortest_path(0, 7));
+    let dijkstra_end = Instant::now();
+
+    let dijkstra_duration = dijkstra_end.duration_since(dijkstra_start);
+    println!("Dijkstra elapsed time: {:#?}", dijkstra_duration);
+
+    my_graph.breadth_first_search(2, 9);
 
     my_graph.clear();
 }
