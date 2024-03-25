@@ -26,7 +26,7 @@ fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
 }
 
 fn main() {
-    let mut my_graph = generate_graph(10000, 20000);
+    let mut my_graph = generate_graph(100000, 200000);
 
     let start = Instant::now();
 
@@ -220,7 +220,7 @@ mod tests {
         graph.add_edge(1, 2, 7);
         graph.add_edge(2, 3, 8);
 
-        assert_eq!(graph.shortest_path(0, 2), 11)
+        assert_eq!(graph.shortest_path(0, 2), Some(11))
     }
 
     #[test]
@@ -239,6 +239,6 @@ mod tests {
         graph.add_edge(1, 2, 7);
         graph.add_edge(2, 3, 8);
 
-        assert_eq!(graph.shortest_path(0, 2), 13)
+        assert_eq!(graph.shortest_path(0, 2), Some(13))
     }
 }

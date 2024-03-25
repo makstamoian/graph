@@ -1,9 +1,10 @@
 use serde_json;
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
+use std::collections::BinaryHeap;
 use std::time::Instant;
-use std::cmp;
 
 // Nodes: 1, 2, 3, 4, 5
 // Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
@@ -19,6 +20,24 @@ use std::cmp;
 #[derive(Debug)]
 pub struct Graph {
     pub nodes: HashMap<u32, HashSet<(u32, u32)>>,
+}
+
+#[derive(Copy, Clone, Eq, PartialEq)]
+struct DijkstraState {
+    node: u32,
+    cost: i32,
+}
+
+impl Ord for DijkstraState {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.cost.cmp(&self.cost).then_with(|| self.node.cmp(&other.node))
+    }
+}
+
+impl PartialOrd for DijkstraState {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Graph {
@@ -164,20 +183,21 @@ impl Graph {
         return path;
     }
 
-    pub fn shortest_path(&self, source: u32, target: u32) -> i32 {
+    pub fn shortest_path(&self, source: u32, target: u32) -> Option<u32> {
         if source == target {
-            return 0
+            return Some(0)
         }
 
-        let mut queue: HashSet<u32> = HashSet::new();
+        let mut queue: BinaryHeap<DijkstraState> = BinaryHeap::new();
         let mut tentative_distances: HashMap<u32, i32> = HashMap::new();
         let mut parents: HashMap<u32, i32> = HashMap::new();
 
         for node in self.nodes.keys() {
-            queue.insert(*node);            
             tentative_distances.insert(*node, i32::MAX);
             parents.insert(*node, -1);
         } // add all nodes to queue and distances HashMap with distance to them as i32::MAX
+
+        queue.push(DijkstraState {node: source, cost: 0});
 
         tentative_distances.entry(source).and_modify(|entry| {
             *entry = 0;
@@ -186,45 +206,32 @@ impl Graph {
             *entry = 0;
         });
 
-        while queue.len() > 0 {
-            let mut closest_node = *queue.iter().next().unwrap();
-            for node in &queue {
-                if *tentative_distances.get(&node).unwrap() < *tentative_distances.get(&closest_node).unwrap() {
-                    closest_node = *node;
-                }
-            }
-            
-            if closest_node == target {
-                if *tentative_distances.get(&target).unwrap() < 0 || *tentative_distances.get(&target).unwrap() == i32::MAX {
-                    return -1;
-                }
-
+        while let Some(DijkstraState {node, cost}) = queue.pop() {
+            if node == target {
                 println!("Shortest path: {:?}", self.restore_path(source, target, parents));
-                
-                return *tentative_distances.get(&target).unwrap() as i32;
+                return Some(cost as u32)
+            }
+            if cost > *tentative_distances.get(&node).unwrap() {
+                continue;
             }
 
-            queue.remove(&closest_node);
+            for node_tuple in &self.nodes[&node] {
+                let next: DijkstraState = DijkstraState { node: node_tuple.0, cost: node_tuple.1 as i32 + cost };
 
-            for node_tuple in &self.nodes[&closest_node] {
-                let distance = node_tuple.1;
-                let node = node_tuple.0;
-                if !queue.contains(&node) {
-                    continue;
+                if next.cost < *tentative_distances.get(&next.node).unwrap() {
+                    queue.push(next);
+                    tentative_distances.entry(next.node).and_modify(|entry| {
+                        *entry = next.cost;
+                    });
+                    parents.entry(next.node).and_modify(|entry| {
+                        *entry = node as i32;
+                    });
                 }
-
-                let minimal_distance = cmp::min(*tentative_distances.get(&node).unwrap(), distance as i32 + *tentative_distances.get(&closest_node).unwrap());
-
-                tentative_distances.entry(node).and_modify(|entry| {
-                    *entry = minimal_distance;
-                });
-                parents.entry(node).and_modify(|entry| {
-                    *entry = closest_node as i32;
-                });
             }
         }
+        println!("{:#?}", tentative_distances);
 
-        return -1;
+        return None;
     }
 
     pub fn is_connected(&self) -> bool {
