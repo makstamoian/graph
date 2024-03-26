@@ -1,10 +1,10 @@
+
 use serde_json;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::collections::BinaryHeap;
-use std::time::Instant;
 
 // Nodes: 1, 2, 3, 4, 5
 // Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
@@ -26,6 +26,12 @@ pub struct Graph {
 struct DijkstraState {
     node: u32,
     cost: i32,
+}
+
+#[derive(PartialEq, Debug)]
+pub struct DijkstraResult {
+    pub cost: Option<u32>,
+    pub parents: Option<HashMap<u32, i32>>
 }
 
 impl Ord for DijkstraState {
@@ -51,21 +57,6 @@ impl Graph {
         self.nodes.insert(node, HashSet::new());
     }
 
-    pub fn add_edge(&mut self, source: u32, target: u32, weight: u32) {
-        if source != target {
-            self.nodes
-                .entry(source)
-                .and_modify(|adjacency_set: &mut HashSet<(u32, u32)>| {
-                    adjacency_set.insert((target, weight));
-                });
-            self.nodes
-                .entry(target)
-                .and_modify(|adjacency_set: &mut HashSet<(u32, u32)>| {
-                    adjacency_set.insert((source, weight));
-                });
-        }
-    }
-
     pub fn add_edge_directed(&mut self, source: u32, target: u32, weight: u32) {
         if source != target {
             self.nodes
@@ -76,18 +67,23 @@ impl Graph {
         }
     }
 
-    pub fn drop_edge(&mut self, node_a: u32, node_b: u32) {
+    pub fn add_edge(&mut self, source: u32, target: u32, weight: u32) {
+        self.add_edge_directed(source, target, weight);
+        self.add_edge_directed(target, source, weight)
+    }
+
+    pub fn drop_edge_directed(&mut self, node_a: u32, node_b: u32) {
         self.nodes
             .entry(node_a)
             .and_modify(|adjacency_set: &mut HashSet<(u32, u32)>| {
                 adjacency_set.retain(|&(first, _)| first != node_b);
 
             });
-        self.nodes
-            .entry(node_b)
-            .and_modify(|adjacency_set: &mut HashSet<(u32, u32)>| {
-                adjacency_set.retain(|&(first, _)| first != node_a);
-            });
+    }
+
+    pub fn drop_edge(&mut self, node_a: u32, node_b: u32) {
+        self.drop_edge_directed(node_a, node_b);
+        self.drop_edge_directed(node_b, node_a);
     }
 
     pub fn drop_node(&mut self, node: u32) {
@@ -103,12 +99,16 @@ impl Graph {
         return self.nodes.contains_key(&node);
     }
 
-    pub fn has_edge(&self, node_a: u32, node_b: u32) -> bool {
+    pub fn has_edge_directed(&self, node_a: u32, node_b: u32) -> bool {
         if self.has_node(node_a) && self.has_node(node_b) {
-            return self.nodes[&node_a].iter().any(|&(first, _)| first == node_b) && self.nodes[&node_b].iter().any(|&(first, _)| first == node_a);
+            return self.nodes[&node_a].iter().any(|&(first, _)| first == node_b);
         }
 
         return false;
+    }
+
+    pub fn has_edge(&self, node_a: u32, node_b: u32) -> bool {
+        return self.has_edge_directed(node_a, node_b) && self.has_edge_directed(node_b, node_a);
     }
 
     pub fn get_node_adjacents(&self, node: u32) -> &HashSet<(u32, u32)> {
@@ -131,8 +131,6 @@ impl Graph {
         let mut stack: VecDeque<u32> = VecDeque::new();
         let mut visited_nodes: HashSet<u32> = HashSet::new();
 
-        let start = Instant::now();
-
         stack.push_back(node);
 
         while let Some(node_pop) = stack.pop_back() {
@@ -144,10 +142,6 @@ impl Graph {
             }
         }
 
-        let end = Instant::now();
-        let duration = end.duration_since(start);
-        println!("DFS elapsed time: {:#?}", duration);
-
         return visited_nodes;
     }
 
@@ -155,17 +149,11 @@ impl Graph {
         let mut queue: VecDeque<u32> = VecDeque::new();
         let mut visited_nodes: HashSet<u32> = HashSet::new();
 
-        let start = Instant::now();
-
         visited_nodes.insert(node);
         queue.push_back(node);
 
         while let Some(node_pop) = queue.pop_front() {
             if node_pop == target {
-                let end = Instant::now();
-                let duration = end.duration_since(start);
-                println!("BFS lapsed time: {:#?}", duration);
-
                 return node_pop as i32;
             }
 
@@ -175,15 +163,10 @@ impl Graph {
             }
         }
 
-        let end = Instant::now();
-        let duration = end.duration_since(start);
-
-        println!("BFS lapsed time: {:#?}", duration);
-
         return -1;
     }
 
-    fn restore_path(&self, source: u32, target: u32, parents: HashMap<u32, i32>) -> VecDeque<u32> {
+    pub fn restore_path(&self, source: u32, target: u32, parents: HashMap<u32, i32>) -> VecDeque<u32> {
         let mut path: VecDeque<u32> = VecDeque::from([]);
         let mut current_node = target;
         while current_node != source {
@@ -194,9 +177,9 @@ impl Graph {
         return path;
     }
 
-    pub fn shortest_path(&self, source: u32, target: u32) -> Option<u32> {
+    pub fn shortest_path(&self, source: u32, target: u32) -> DijkstraResult {
         if source == target {
-            return Some(0)
+            return DijkstraResult { cost: Some(0), parents: Some(HashMap::from([(0, 0)])) }
         }
 
         let mut queue: BinaryHeap<DijkstraState> = BinaryHeap::new();
@@ -219,8 +202,7 @@ impl Graph {
 
         while let Some(DijkstraState {node, cost}) = queue.pop() {
             if node == target {
-                println!("Shortest path: {:?}", self.restore_path(source, target, parents));
-                return Some(cost as u32)
+                return DijkstraResult { cost: Some(cost as u32), parents: Some(parents) };
             }
             if cost > *tentative_distances.get(&node).unwrap() {
                 continue;
@@ -240,9 +222,8 @@ impl Graph {
                 }
             }
         }
-        println!("{:#?}", tentative_distances);
 
-        return None;
+        return DijkstraResult {cost: None, parents: None} ;
     }
 
     pub fn is_connected(&self) -> bool {
