@@ -1,74 +1,5 @@
-use rand::Rng;
-mod graph;
-use std::time::Instant;
-
-
-fn generate_graph(nodes_count: u32, edges_count: u32) -> graph::Graph {
-    let mut graph = graph::Graph::new();
-    for node in 0..nodes_count + 1 {
-        graph.add_node(node)
-    }
-    for _edge in 0..edges_count + 1 {
-        let source_node = rand::thread_rng().gen_range(0, nodes_count);
-        let mut target_node: u32;
-
-        loop {
-            target_node = rand::thread_rng().gen_range(0, nodes_count);
-            if target_node != source_node {
-                break;
-            }
-        }
-
-        graph.add_edge(source_node, target_node, rand::thread_rng().gen_range(1,100))
-    }
-
-    return graph;
-}
-
 fn main() {
-    let mut my_graph = generate_graph(100000, 200000);
 
-    let start = Instant::now();
-
-    my_graph.serialize();
-
-    let end = Instant::now();
-    let duration = end.duration_since(start);
-    println!("Serialisation elapsed time: {:#?}", duration);
-
-    my_graph.depth_first_search(0);
-
-    my_graph.has_node(1);
-
-    my_graph.has_edge(1, 3);
-
-    my_graph.is_connected();
-
-    my_graph.has_edge(4, 3);
-
-    my_graph.drop_edge(4, 3);
-
-    my_graph.has_edge(4, 3);
-
-    my_graph.get_node_adjacents(1);
-
-    my_graph.get_leaf_nodes();
-
-    my_graph.drop_node(1);
-
-    my_graph.has_node(1);
-
-    let dijkstra_start = Instant::now();
-
-    println!("{:#?}", my_graph.shortest_path(0, 7));
-    let dijkstra_end = Instant::now();
-
-    let dijkstra_duration = dijkstra_end.duration_since(dijkstra_start);
-    println!("Dijkstra elapsed time: {:#?}", dijkstra_duration);
-
-    my_graph.breadth_first_search(2, 9);
-
-    my_graph.clear();
 }
 
 #[cfg(test)]
@@ -91,8 +22,6 @@ mod tests {
 
         return graph;
     }
-
-    use super::*;
 
     #[test]
     fn test_graph_add_edge() {
@@ -220,7 +149,9 @@ mod tests {
         graph.add_edge(1, 2, 7);
         graph.add_edge(2, 3, 8);
 
-        assert_eq!(graph.shortest_path(0, 2), Some(11))
+        let result = graph.shortest_path(0, 2);
+
+        assert_eq!(result.cost.unwrap(), 11);
     }
 
     #[test]
@@ -239,6 +170,33 @@ mod tests {
         graph.add_edge(1, 2, 7);
         graph.add_edge(2, 3, 8);
 
-        assert_eq!(graph.shortest_path(0, 2), Some(13))
+        let result = graph.shortest_path(0, 2);
+
+        assert_eq!(result.cost.unwrap(), 13);
+    }
+
+    #[test]
+    fn test_graph_directed_edge() {
+        let mut graph = graph::Graph {
+            nodes: HashMap::new(),
+        };
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1, 6);
+        graph.add_edge(0, 2, 16);
+        graph.add_edge(1, 2, 7);
+        graph.add_edge_directed(2, 3, 8);
+
+        assert_eq!(graph.has_edge(2, 3), false);
+        assert_eq!(graph.has_edge_directed(2, 3), true);
+        assert_eq!(graph.has_edge_directed(3, 2), false);
+
+        graph.drop_edge(2, 3);
+        assert_eq!(graph.has_edge_directed(2, 3), false);
+
     }
 }
