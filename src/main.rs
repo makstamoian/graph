@@ -10,8 +10,8 @@ mod tests {
     // This function creates universe-usable graph in the field of tests, which is suitable for almost every test.
     // For tests, there the tested graph has to have specific properties (be disconnected)
 
-    fn generate_test_graph() -> graph::Graph {
-        let mut graph = graph::Graph::new();
+    fn generate_test_graph() -> mgraph::Graph {
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
@@ -41,7 +41,7 @@ mod tests {
 
     #[test]
     fn test_graph_has_node() {
-        let mut graph = graph::Graph {
+        let mut graph = mgraph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_graph_connected_false() {
-        let mut graph = graph::Graph {
+        let mut graph = mgraph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn test_graph_get_leaf_nodes() {
-        let mut graph = graph::Graph {
+        let mut graph = mgraph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_graph_drops_edge() {
-        let mut graph = graph::Graph {
+        let mut graph = mgraph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -135,7 +135,7 @@ mod tests {
 
     #[test]
     fn test_graph_shortest_path_1() {
-        let mut graph = graph::Graph {
+        let mut graph = mgraph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn test_graph_shortest_path_2() {
-        let mut graph = graph::Graph {
+        let mut graph = mgraph::Graph {
             nodes: HashMap::new(),
         };
 
@@ -177,7 +177,7 @@ mod tests {
 
     #[test]
     fn test_graph_directed_edge() {
-        let mut graph = graph::Graph {
+        let mut graph = mgraph::Graph {
             nodes: HashMap::new(),
         };
 
