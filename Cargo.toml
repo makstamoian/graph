@@ -6,6 +6,7 @@ readme = "./README.md"
 authors = [ "Maks Tamoian <maks.tamoian@gmail.com>" ]
 description = "A simple, performance-oriented graph library for Rust"
 license = "MIT"
+repository = "https://github.com/makstamoian/graph/"
 
 exclude = [
     'src/main.rs',
