@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 readme = "./README.md"
 authors = [ "makstamoian" ]
+description = "A simple, performance-oriented graph library for Rust"
+license = "MIT"
 
 exclude = [
     'src/main.rs',
