@@ -3,7 +3,7 @@ name = "graph"
 version = "0.1.0"
 edition = "2021"
 readme = "./README.md"
-authors = [ "makstamoian" ]
+authors = [ "Maks Tamoian maks.tamoian@gmail.com" ]
 description = "A simple, performance-oriented graph library for Rust"
 license = "MIT"
 
