@@ -66,6 +66,16 @@ impl Graph {
         }
     }
 
+    pub fn add_edge_directed(&mut self, source: u32, target: u32, weight: u32) {
+        if source != target {
+            self.nodes
+                .entry(source)
+                .and_modify(|adjacency_set: &mut HashSet<(u32, u32)>| {
+                    adjacency_set.insert((target, weight));
+                });
+        }
+    }
+
     pub fn drop_edge(&mut self, node_a: u32, node_b: u32) {
         self.nodes
             .entry(node_a)
@@ -81,11 +91,12 @@ impl Graph {
     }
 
     pub fn drop_node(&mut self, node: u32) {
-        let adjacent_nodes = self.nodes[&node].clone();
-        for adjacent in &adjacent_nodes {
-            self.drop_edge(node, (*adjacent).0);
-        }
         self.nodes.remove(&node);
+        for (_, adjacents) in self.nodes.iter_mut() {
+            adjacents.retain(|&adjacent| {
+                adjacent.1 != node
+            })
+        }
     }
 
     pub fn has_node(&self, node: u32) -> bool {
