@@ -3,7 +3,8 @@ This is a simple graph library packed up into a crate (https://crates.io/crates/
 ```cargo add mgraph```
 
 # **Example usage**
-1. Let's assume you want to find the shortest path in a graph using Dijkstra algorithm. First, we need to create the graph itself:
+Let's assume you want to find the shortest path in a graph using Dijkstra algorithm. 
+1. First, we need to create the graph itself:
 
 ```let mut graph = mgraph::Graph::new()```
 
