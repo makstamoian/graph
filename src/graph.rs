@@ -1,3 +1,41 @@
+//! ## Mgraph
+//! mgraph is a simple, fast, performace-oriented graph library for Rust. It's being contributed to on daily basis and grows fast!
+//! 
+//! ## Features
+//! 
+//! Features that are implemented already:
+//! 
+//! -  DFS algorithm
+//! -  BFS algorithm
+//! -  Dijkstra shortest path algorithm
+//! -  Serialization and deserialization of graphs
+//! 
+//! Features that are to be implemented in future:
+//! 
+//! -  A* algorithm
+//! -  Other intresting things of graph theory, such as different search algorithms, sorting algorithms etc.
+//!
+//! ## Example usage
+//! 
+//! ```
+//! let mut graph = mgraph::Graph::new()
+//! 
+//! graph.add_node(0);
+//! graph.add_node(1);
+//! graph.add_node(2);
+//! graph.add_node(3);
+//! 
+//! graph.add_edge(0, 1, 6);
+//! graph.add_edge(0, 2, 16);
+//! graph.add_edge(1, 2, 7);
+//! graph.add_edge(2, 3, 8);
+//! 
+//! let result = graph.shortest_path(0, 2);
+//! println!("{:#?}\n\n{:?}", result.cost.unwrap(), result.parents.unwrap());
+//! 
+//! let shortest_path = graph.restore_path(0, 2, parents);
+//! ``` 
+
 
 use serde_json;
 use std::cmp::Ordering;
@@ -6,19 +44,13 @@ use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::collections::BinaryHeap;
 
-// Nodes: 1, 2, 3, 4, 5
-// Edge: 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4, 4 -> 5
-//
-// Adjacency Sets
-//
-// Map:
-// 1 => Set[2, 3]
-// 2 => Set[4]
-// 3 => Set[4]
-// 4 => Set[5]
 
+/// Graph data structure
 #[derive(Debug)]
 pub struct Graph {
+    /// Nodes data structure, a HashMap of a node and a tuple of adjacent node and edge weight. 
+    /// Nodes and weights are represented as integers of type `u32`.
+    /// This implementation of graph data structure uses adjacentcy list architecture rather than adjacency matrix because of second's bad performance
     pub nodes: HashMap<u32, HashSet<(u32, u32)>>,
 }
 
@@ -28,9 +60,12 @@ struct DijkstraState {
     cost: i32,
 }
 
+/// DijkstraResult structure contains shortest path algorithm return values
 #[derive(PartialEq, Debug)]
 pub struct DijkstraResult {
-    pub cost: Option<u32>,
+    /// Cost of shortest path. `Option<u32>` if exists, `None` if no path was found
+    pub cost: Option<u32>, 
+    /// Map of a node and its predecessor, used in `resore_path()`. `Option<HashMap<u32, i32>>` if exists, `None` otherwise.
     pub parents: Option<HashMap<u32, i32>>
 }
 
@@ -47,15 +82,21 @@ impl PartialOrd for DijkstraState {
 }
 
 impl Graph {
+
+    /// Creates new graph of the `Graph` type.
     pub fn new() -> Self {
         Self {
             nodes: HashMap::new(),
         }
     }
 
+    /// Adds a node to the graph.
+
     pub fn add_node(&mut self, node: u32) {
         self.nodes.insert(node, HashSet::new());
     }
+
+    /// Adds a directed edge between `source` and `target` with the weight `weight`. After using this function, an edge will appear for `source`, but not for `target`.
 
     pub fn add_edge_directed(&mut self, source: u32, target: u32, weight: u32) {
         if source != target {
@@ -67,10 +108,14 @@ impl Graph {
         }
     }
 
+    /// Adds an edge between `source` and `target` with the weight `weight`. After using this function, and edge will appear for both `source` and `target`.
+
     pub fn add_edge(&mut self, source: u32, target: u32, weight: u32) {
         self.add_edge_directed(source, target, weight);
         self.add_edge_directed(target, source, weight)
     }
+
+    /// Drops edge from `node_a` to `node_b`. After using this function, only edge from `node_a` to `node_b` will be terminated, however connection between `node_b` and `node_a` will still remain.
 
     pub fn drop_edge_directed(&mut self, node_a: u32, node_b: u32) {
         self.nodes
@@ -81,10 +126,14 @@ impl Graph {
             });
     }
 
+    /// Drops edge from `node_a` to `node_b` and vise-versa. After using this function, no connection between nodes `node_a` and `node_b` will remain.
+
     pub fn drop_edge(&mut self, node_a: u32, node_b: u32) {
         self.drop_edge_directed(node_a, node_b);
         self.drop_edge_directed(node_b, node_a);
     }
+
+    /// Drops a node and all edges going to that node from adjacent nodes. 
 
     pub fn drop_node(&mut self, node: u32) {
         self.nodes.remove(&node);
@@ -95,9 +144,13 @@ impl Graph {
         }
     }
 
+    /// Checks if graph has a certain node. 
+
     pub fn has_node(&self, node: u32) -> bool {
         return self.nodes.contains_key(&node);
     }
+
+    /// Checks if there is an edge from `node_a` to `node_b`.
 
     pub fn has_edge_directed(&self, node_a: u32, node_b: u32) -> bool {
         if self.has_node(node_a) && self.has_node(node_b) {
@@ -107,13 +160,20 @@ impl Graph {
         return false;
     }
 
+    /// Checks if there is and edge from `node_a` to `node_b` and an edge from `node_b` to `node_a`.
+
     pub fn has_edge(&self, node_a: u32, node_b: u32) -> bool {
         return self.has_edge_directed(node_a, node_b) && self.has_edge_directed(node_b, node_a);
     }
 
+    /// Returns all adjacent nodes of `node`
+
     pub fn get_node_adjacents(&self, node: u32) -> &HashSet<(u32, u32)> {
         return &self.nodes[&node];
     }
+
+    /// Returns all leaf nodes in graph.
+    /// Leaf nodes are nodes which have only one adjacent node.
 
     pub fn get_leaf_nodes(&self) -> HashSet<u32> {
         let mut leaf_nodes: HashSet<u32> = HashSet::new();
@@ -166,6 +226,8 @@ impl Graph {
         return -1;
     }
 
+    /// Restores path from `source` to `target`. `parents` is a `HashMap<u32, i32>`, which stores a node and its predecessor.
+
     pub fn restore_path(&self, source: u32, target: u32, parents: HashMap<u32, i32>) -> VecDeque<u32> {
         let mut path: VecDeque<u32> = VecDeque::from([]);
         let mut current_node = target;
@@ -176,6 +238,9 @@ impl Graph {
         path.push_front(source);
         return path;
     }
+
+    /// Finds the length of the shortest path from `source` to `target` using Dijkstra algorithm.
+    /// Returns `DijkstraResult`.
 
     pub fn shortest_path(&self, source: u32, target: u32) -> DijkstraResult {
         if source == target {
@@ -226,6 +291,9 @@ impl Graph {
         return DijkstraResult {cost: None, parents: None} ;
     }
 
+    /// Checks if a graph is conected. 
+    /// Conected graph is a graph where there is no nodes with less than one adjacent node.
+
     pub fn is_connected(&self) -> bool {
         let visited_nodes = self.depth_first_search(0);
         if visited_nodes.len() < self.nodes.len() {
@@ -234,9 +302,13 @@ impl Graph {
         return true;
     }
 
+    /// Serializes a graph into JSON format.
+
     pub fn serialize(&self) -> String {
         return serde_json::to_string(&self.nodes).unwrap();
     }
+
+    /// Clears graph from edges.
 
     pub fn clear(&mut self) -> &HashMap<u32, HashSet<(u32, u32)>> {
         let _ = &self.nodes.clear();
