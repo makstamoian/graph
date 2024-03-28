@@ -33,7 +33,11 @@ Arguments of the `add_edge()` function are source node, target node and edge wei
 
 ```
 let result = graph.shortest_path(0, 2);
-println!("{:#?}\n\n{:?}", result.cost.unwrap(), result.parents.unwrap());
+
+let parents = result.parents.unwrap();
+let cost = result.cost.unwrap();
+
+println!("{:#?}\n\n{:?}", cost, parents);
 ```
 
 The ```shortest_path()``` function returns two values: ```cost``` and ```parents```. ```cost``` is the cost of the shortest path from node A to node B (if one exists), while ```parents``` is a HashMap which represents a node and its predecessor (parent). We need ```parents``` to be able to restore the full shortest path from node A to node B, once again, if one exists. 

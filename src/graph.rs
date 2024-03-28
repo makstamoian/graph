@@ -18,7 +18,7 @@
 //! ## Example usage
 //! 
 //! ```
-//! let mut graph = mgraph::Graph::new()
+//! let mut graph = mgraph::Graph::new();
 //! 
 //! graph.add_node(0);
 //! graph.add_node(1);
@@ -31,7 +31,11 @@
 //! graph.add_edge(2, 3, 8);
 //! 
 //! let result = graph.shortest_path(0, 2);
-//! println!("{:#?}\n\n{:?}", result.cost.unwrap(), result.parents.unwrap());
+//! 
+//! let parents = result.parents.unwrap();
+//! let cost = result.cost.unwrap();
+//! 
+//! println!("{:#?}\n\n{:?}", cost, parents);
 //! 
 //! let shortest_path = graph.restore_path(0, 2, parents);
 //! ``` 
