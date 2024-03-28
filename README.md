@@ -2,6 +2,8 @@
 This is a simple graph library packed up into a crate (https://crates.io/crates/mgraph). You can add it to your project by running:
 ```cargo add mgraph```
 
+Docs: https://docs.rs/mgraph/latest/mgraph/
+
 # **Example usage**
 Let's assume you want to find the shortest path in a graph using Dijkstra algorithm. 
 1. First, we need to create the graph itself:
