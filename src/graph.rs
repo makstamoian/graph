@@ -258,7 +258,7 @@ impl Graph {
         for node in self.nodes.keys() {
             tentative_distances.insert(*node, i32::MAX);
             parents.insert(*node, -1);
-        } // add all nodes to queue and distances HashMap with distance to them as i32::MAX
+        } // add all nodes to queue and distances HashMap with distance to them set to i32::MAX by default. 
 
         queue.push(DijkstraState {node: source, cost: 0});
 
@@ -296,7 +296,7 @@ impl Graph {
     }
 
     /// Checks if a graph is conected. 
-    /// Conected graph is a graph where there is no nodes with less than one adjacent node.
+    /// Conected graph is a graph where there are no nodes with less than one adjacent node.
 
     pub fn is_connected(&self) -> bool {
         let visited_nodes = self.depth_first_search(0);
