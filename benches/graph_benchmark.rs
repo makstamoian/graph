@@ -13,9 +13,15 @@ fn criterion_benchmark(c: &mut Criterion) {
     graph.add_edge(1, 2, 7);
     graph.add_edge(2, 3, 8);
 
+    fn heuristic(_node: u32, _target: u32) -> u32 {
+        return 1;
+    }
+
     c.bench_function("BFS", |b| b.iter(|| graph.breadth_first_search(black_box(0), black_box(3))));
     c.bench_function("DFS", |b| b.iter(|| graph.depth_first_search(black_box(0))));
     c.bench_function("Dijkstra", |b| b.iter(|| graph.shortest_path(black_box(0), black_box(3))));
+    c.bench_function("A*", |b| b.iter(|| graph.astar(black_box(0), black_box(3), black_box(heuristic))));
+
 }
 
 criterion_group!(benches, criterion_benchmark);

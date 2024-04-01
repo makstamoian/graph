@@ -295,6 +295,60 @@ impl Graph {
         return DijkstraResult {cost: None, parents: None} ;
     }
 
+    pub fn astar(&self, source: u32, target: u32, heuristic: impl Fn(u32, u32) -> u32) -> u32 {
+        if source == target {
+            return 0;
+        }
+
+        let mut queue: BinaryHeap<DijkstraState> = BinaryHeap::new();
+        let mut tentative_distances: HashMap<u32, i32> = HashMap::new();
+        let mut parents: HashMap<u32, i32> = HashMap::new();
+
+        for node in self.nodes.keys() {
+            tentative_distances.insert(*node, i32::MAX);
+            parents.insert(*node, -1);
+        } // add all nodes to queue and distances HashMap with distance to them set to i32::MAX by default. 
+
+        // reweighting the graph...
+
+        queue.push(DijkstraState {node: source, cost: 0});
+
+        tentative_distances.entry(source).and_modify(|entry| {
+            *entry = 0;
+        }); // set distance to source to 0
+        parents.entry(source).and_modify(|entry| {
+            *entry = 0;
+        });
+
+        while let Some(DijkstraState {node, cost}) = queue.pop() {
+            if node == target {
+                return *tentative_distances.get(&node).unwrap() as u32;
+            }
+            
+            if cost > *tentative_distances.get(&node).unwrap() {
+                continue;
+            }
+
+            for node_tuple in &self.nodes[&node] { // for adjacent node to our node that we are observing
+                let next_cost = node_tuple.1 as i32 + cost;
+                let next_node = node_tuple.0;
+
+                if next_cost < *tentative_distances.get(&next_node).unwrap() {
+                    queue.push(DijkstraState { node: next_node, cost: next_cost + heuristic(next_node, target) as i32 });
+                    tentative_distances.entry(next_node).and_modify(|entry| {
+                        *entry = next_cost;
+                    });
+                    parents.entry(next_node).and_modify(|entry| {
+                        *entry = node as i32;
+                    });
+                }
+            }
+        }
+    
+        return 0;
+    }
+
+
     /// Checks if a graph is conected. 
     /// Conected graph is a graph where there are no nodes with less than one adjacent node.
 

@@ -1,4 +1,4 @@
-fn main() {
+fn main () {
 
 }
 
@@ -41,9 +41,7 @@ mod tests {
 
     #[test]
     fn test_graph_has_node() {
-        let mut graph = mgraph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
 
@@ -66,9 +64,7 @@ mod tests {
 
     #[test]
     fn test_graph_connected_false() {
-        let mut graph = mgraph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
@@ -81,9 +77,7 @@ mod tests {
 
     #[test]
     fn test_graph_get_leaf_nodes() {
-        let mut graph = mgraph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
@@ -99,9 +93,7 @@ mod tests {
 
     #[test]
     fn test_graph_drops_edge() {
-        let mut graph = mgraph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
@@ -135,9 +127,7 @@ mod tests {
 
     #[test]
     fn test_graph_shortest_path_1() {
-        let mut graph = mgraph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
@@ -156,9 +146,7 @@ mod tests {
 
     #[test]
     fn test_graph_shortest_path_2() {
-        let mut graph = mgraph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
@@ -177,9 +165,7 @@ mod tests {
 
     #[test]
     fn test_graph_directed_edge() {
-        let mut graph = mgraph::Graph {
-            nodes: HashMap::new(),
-        };
+        let mut graph = mgraph::Graph::new();
 
         graph.add_node(0);
         graph.add_node(1);
@@ -198,5 +184,28 @@ mod tests {
         graph.drop_edge(2, 3);
         assert_eq!(graph.has_edge_directed(2, 3), false);
 
+    }
+
+    #[test]
+    fn test_graph_shortest_path_1_astar() {
+        let mut graph = mgraph::Graph::new();
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1, 6);
+        graph.add_edge(0, 2, 11);
+        graph.add_edge(1, 2, 7);
+        graph.add_edge(2, 3, 8);
+
+        fn heuristic(_node: u32, _target: u32) -> u32 {
+            return 1;
+        }
+
+        let result = graph.astar(0, 2, heuristic);
+
+        assert_eq!(result, 11);
     }
 }
