@@ -208,4 +208,15 @@ mod tests {
 
         assert_eq!(result, 11);
     }
+    #[test]
+    fn test_euclidian_distance () {
+        let graph = mgraph::Graph::new();
+        assert_eq!(graph.euclidian_distance((0, 4), (3, 0)), 5 as f32);
+    }
+
+    #[test]
+    fn test_manhattan_distance () {
+        let graph = mgraph::Graph::new();
+        assert_eq!(graph.manhattan_distance((0, 4), (3, 0)), 7);
+    }
 }

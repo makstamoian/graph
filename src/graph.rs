@@ -48,7 +48,6 @@ use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::collections::BinaryHeap;
 
-
 /// Graph data structure
 #[derive(Debug)]
 pub struct Graph {
@@ -293,6 +292,14 @@ impl Graph {
         }
 
         return DijkstraResult {cost: None, parents: None} ;
+    }
+
+    pub fn manhattan_distance(&self, source: (u32, u32), target: (u32, u32)) -> u32 {
+        return source.0.abs_diff(target.0) + source.1.abs_diff(target.1)
+    }
+
+    pub fn euclidian_distance(&self, source: (u32, u32), target: (u32, u32)) -> f32 {
+        return (source.0.abs_diff(target.0).pow(2) as f32 + source.1.abs_diff(target.1).pow(2) as f32).sqrt()
     }
 
     pub fn astar(&self, source: u32, target: u32, heuristic: impl Fn(u32, u32) -> u32) -> u32 {
