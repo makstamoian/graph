@@ -367,7 +367,7 @@ impl Graph {
         return true;
     }
 
-    /// Serializes a graph into JSON format.
+    /// Serializes a graph into JSON format. (uses serde)
 
     pub fn serialize(&self) -> String {
         return serde_json::to_string(&self.nodes).unwrap();
