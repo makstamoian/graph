@@ -219,4 +219,24 @@ mod tests {
         let graph = mgraph::Graph::new();
         assert_eq!(graph.manhattan_distance((0, 4), (3, 0)), 7);
     }
+
+    #[test]
+    fn test_graph_bellman_ford_1() {
+        let mut graph = mgraph::Graph::new();
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1, 6);
+        graph.add_edge(0, 2, 11);
+        graph.add_edge(1, 2, 7);
+        graph.add_edge(2, 3, 8);
+
+        let distances = graph.bellman_ford(0);
+        let result = distances.get(&2).unwrap();
+
+        assert_eq!(*result, 11);
+    }
 }

@@ -355,6 +355,35 @@ impl Graph {
         return 0;
     }
 
+    pub fn bellman_ford(&self, source: u32) -> HashMap<u32, u32> {
+        let mut distances: HashMap<u32, u32> = HashMap::new();
+
+        for node in self.nodes.keys() {
+            distances.insert(*node, u32::MAX);
+        }
+
+        distances.insert(source, 0);
+
+        for _ in 0..self.nodes.len() - 1 {
+            for node in &self.nodes {
+                for edge in node.1 {
+                    let target = edge.0;
+                    let distance = edge.1;
+
+                    let potential_distance = distances.get(&node.0).unwrap().saturating_add(distance);
+
+                    if distances.get(&target).unwrap() > &potential_distance {
+                        distances.entry(target).and_modify(|dist| {
+                            *dist = potential_distance;
+                        });
+                    }
+                }
+            }
+        }
+
+        return distances;
+    }
+
 
     /// Checks if a graph is conected. 
     /// Conected graph is a graph where there are no nodes with less than one adjacent node.

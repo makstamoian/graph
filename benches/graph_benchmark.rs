@@ -21,6 +21,8 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("DFS", |b| b.iter(|| graph.depth_first_search(black_box(0))));
     c.bench_function("Dijkstra", |b| b.iter(|| graph.shortest_path(black_box(0), black_box(3))));
     c.bench_function("A*", |b| b.iter(|| graph.astar(black_box(0), black_box(3), black_box(heuristic))));
+    c.bench_function("Bellman-Ford", |b| b.iter(|| graph.bellman_ford(black_box(0))));
+
 
 }
 
