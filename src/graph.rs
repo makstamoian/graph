@@ -54,7 +54,7 @@ pub struct Graph {
     /// Nodes data structure, a HashMap of a node and a tuple of adjacent node and edge weight. 
     /// Nodes and weights are represented as integers of type `u32`.
     /// This implementation of graph data structure uses adjacentcy list architecture rather than adjacency matrix because of second's bad performance
-    pub nodes: HashMap<u32, HashSet<(u32, u32)>>,
+    pub nodes: HashMap<u32, HashSet<(u32, i32)>>,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -101,11 +101,11 @@ impl Graph {
 
     /// Adds a directed edge between `source` and `target` with the weight `weight`. After using this function, an edge will appear for `source`, but not for `target`.
 
-    pub fn add_edge_directed(&mut self, source: u32, target: u32, weight: u32) {
+    pub fn add_edge_directed(&mut self, source: u32, target: u32, weight: i32) {
         if source != target {
             self.nodes
                 .entry(source)
-                .and_modify(|adjacency_set: &mut HashSet<(u32, u32)>| {
+                .and_modify(|adjacency_set: &mut HashSet<(u32, i32)>| {
                     adjacency_set.insert((target, weight));
                 });
         }
@@ -113,7 +113,7 @@ impl Graph {
 
     /// Adds an edge between `source` and `target` with the weight `weight`. After using this function, and edge will appear for both `source` and `target`.
 
-    pub fn add_edge(&mut self, source: u32, target: u32, weight: u32) {
+    pub fn add_edge(&mut self, source: u32, target: u32, weight: i32) {
         self.add_edge_directed(source, target, weight);
         self.add_edge_directed(target, source, weight)
     }
@@ -123,7 +123,7 @@ impl Graph {
     pub fn drop_edge_directed(&mut self, node_a: u32, node_b: u32) {
         self.nodes
             .entry(node_a)
-            .and_modify(|adjacency_set: &mut HashSet<(u32, u32)>| {
+            .and_modify(|adjacency_set: &mut HashSet<(u32, i32)>| {
                 adjacency_set.retain(|&(first, _)| first != node_b);
 
             });
@@ -142,7 +142,7 @@ impl Graph {
         self.nodes.remove(&node);
         for (_, adjacents) in self.nodes.iter_mut() {
             adjacents.retain(|&adjacent| {
-                adjacent.1 != node
+                adjacent.0 != node
             })
         }
     }
@@ -171,7 +171,7 @@ impl Graph {
 
     /// Returns all adjacent nodes of `node`
 
-    pub fn get_node_adjacents(&self, node: u32) -> &HashSet<(u32, u32)> {
+    pub fn get_node_adjacents(&self, node: u32) -> &HashSet<(u32, i32)> {
         return &self.nodes[&node];
     }
 
@@ -355,11 +355,11 @@ impl Graph {
         return 0;
     }
 
-    pub fn bellman_ford(&self, source: u32) -> HashMap<u32, u32> {
-        let mut distances: HashMap<u32, u32> = HashMap::new();
+    pub fn bellman_ford(&self, source: u32) -> HashMap<u32, i32> {
+        let mut distances: HashMap<u32, i32> = HashMap::new();
 
         for node in self.nodes.keys() {
-            distances.insert(*node, u32::MAX);
+            distances.insert(*node, i32::MAX);
         }
 
         distances.insert(source, 0);
@@ -372,6 +372,8 @@ impl Graph {
 
                     let potential_distance = distances.get(&node.0).unwrap().saturating_add(distance);
 
+                    println!("{:#?}", target);
+
                     if distances.get(&target).unwrap() > &potential_distance {
                         distances.entry(target).and_modify(|dist| {
                             *dist = potential_distance;
@@ -382,6 +384,29 @@ impl Graph {
         }
 
         return distances;
+    }
+
+    pub fn has_negative_cycle(&self, distances: &HashMap<u32, i32>) -> bool {
+        let mut new_distances = distances.clone();
+        for node in &self.nodes {
+            for edge in node.1 {
+                let target = edge.0;
+                let distance = edge.1;
+
+                let potential_distance = new_distances.get(&node.0).unwrap().saturating_add(distance);
+
+                if new_distances.get(&target).unwrap() > &potential_distance {
+                    new_distances.entry(target).and_modify(|dist| {
+                        *dist = potential_distance;
+                    });
+                }
+            }
+        }
+
+        print!("{:#?} : {:#?}", new_distances, distances);
+
+        new_distances != *distances
+
     }
 
 
@@ -404,7 +429,7 @@ impl Graph {
 
     /// Clears graph from edges.
 
-    pub fn clear(&mut self) -> &HashMap<u32, HashSet<(u32, u32)>> {
+    pub fn clear(&mut self) -> &HashMap<u32, HashSet<(u32, i32)>> {
         let _ = &self.nodes.clear();
 
         return &self.nodes;

@@ -1,6 +1,4 @@
-fn main () {
-
-}
+fn main() {}
 
 #[cfg(test)]
 mod tests {
@@ -183,7 +181,6 @@ mod tests {
 
         graph.drop_edge(2, 3);
         assert_eq!(graph.has_edge_directed(2, 3), false);
-
     }
 
     #[test]
@@ -209,13 +206,13 @@ mod tests {
         assert_eq!(result, 11);
     }
     #[test]
-    fn test_euclidian_distance () {
+    fn test_euclidian_distance() {
         let graph = mgraph::Graph::new();
         assert_eq!(graph.euclidian_distance((0, 4), (3, 0)), 5 as f32);
     }
 
     #[test]
-    fn test_manhattan_distance () {
+    fn test_manhattan_distance() {
         let graph = mgraph::Graph::new();
         assert_eq!(graph.manhattan_distance((0, 4), (3, 0)), 7);
     }
@@ -238,5 +235,45 @@ mod tests {
         let result = distances.get(&2).unwrap();
 
         assert_eq!(*result, 11);
+    }
+
+    #[test]
+    fn test_graph_has_negative_cycle_1() {
+        let mut graph = mgraph::Graph::new();
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1, 1); 
+        graph.add_edge(1, 2, 1); 
+        graph.add_edge(2, 3, 1); 
+        graph.add_edge(3, 0, -4);
+
+        let distances = graph.bellman_ford(0);
+        let result = graph.has_negative_cycle(&distances);
+
+        assert_eq!(result, true);
+    }
+
+    #[test]
+    fn test_graph_has_negative_cycle_2() {
+        let mut graph = mgraph::Graph::new();
+
+        graph.add_node(0);
+        graph.add_node(1);
+        graph.add_node(2);
+        graph.add_node(3);
+
+        graph.add_edge(0, 1, 2); 
+        graph.add_edge(1, 2, 3); 
+        graph.add_edge(2, 3, 4); 
+        graph.add_edge(3, 0, 1);
+
+        let distances = graph.bellman_ford(0);
+        let result = graph.has_negative_cycle(&distances);
+
+        assert_eq!(result, false);
     }
 }
