@@ -387,7 +387,7 @@ impl Graph {
     }
 
     pub fn has_negative_cycle(&self, distances: &HashMap<u32, i32>) -> bool {
-        let mut new_distances = distances.clone();
+        let new_distances = distances.clone();
         for node in &self.nodes {
             for edge in node.1 {
                 let target = edge.0;
@@ -396,16 +396,14 @@ impl Graph {
                 let potential_distance = new_distances.get(&node.0).unwrap().saturating_add(distance);
 
                 if new_distances.get(&target).unwrap() > &potential_distance {
-                    new_distances.entry(target).and_modify(|dist| {
-                        *dist = potential_distance;
-                    });
+                    return true;
                 }
             }
         }
 
         print!("{:#?} : {:#?}", new_distances, distances);
 
-        new_distances != *distances
+        return false;
 
     }
 
