@@ -8,11 +8,13 @@ Docs: https://docs.rs/mgraph/latest/mgraph/
 Let's assume you want to find the shortest path in a graph using Dijkstra algorithm. 
 1. First, we need to create the graph itself:
 
-```let mut graph = mgraph::Graph::new()```
+```rust
+let mut graph = mgraph::Graph::new()
+```
 
 2. After that, we need to add nodes to our graph. Nodes are represented by integers.
 
-```
+```rust
 graph.add_node(0);
 graph.add_node(1);
 graph.add_node(2);
@@ -21,7 +23,7 @@ graph.add_node(3);
 
 3. Now we can add connections between our nodes - edges:
 
-```
+```rust
 graph.add_edge(0, 1, 6);
 graph.add_edge(0, 2, 16);
 graph.add_edge(1, 2, 7);
@@ -31,7 +33,7 @@ Arguments of the `add_edge()` function are source node, target node and edge wei
 
 4. Now we can finally run Dijkstra algorithm on our graph and see the result:
 
-```
+```rust
 let result = graph.shortest_path(0, 2);
 
 let parents = result.parents.unwrap();
@@ -44,7 +46,7 @@ The ```shortest_path()``` function returns two values: ```cost``` and ```parents
 
 5. In order to restore the full path, we can use the ```resore_path()``` function:
 
-```
+```rust
 let shortest_path = graph.restore_path(0, 2, parents);
 ```
 
